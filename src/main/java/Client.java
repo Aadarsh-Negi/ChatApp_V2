@@ -7,7 +7,6 @@ import java.net.*;
 
 public class Client implements ActionListener, Runnable, KeyListener{
     JPanel top_area;
-    static int count = 0;
     JTextField temp_msg;
     JButton send;
     static  JFrame screen;
@@ -16,8 +15,8 @@ public class Client implements ActionListener, Runnable, KeyListener{
     BufferedWriter writer;
     BufferedReader reader;
 
-    Client(String s){
-        UserName = s + count + " : ";
+    Client(String s,String ip,int port){
+        UserName = "[" + s + "] : ";
         screen = new JFrame();
         top_area = new JPanel();
         top_area.setLayout(null);
@@ -75,7 +74,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
         try{
 
-            Socket socketClient = new Socket("localhost", 2003);
+            Socket socketClient = new Socket(ip, port);
             writer = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
         }catch(Exception e){}

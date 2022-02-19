@@ -44,7 +44,7 @@ public class Server implements Runnable{
 
 
     public static void main(String[] args) throws Exception{
-        ServerSocket s = new ServerSocket(2003);
+        ServerSocket s = new ServerSocket(4444);
         while(true){
             Socket socket = s.accept();
             Server server = new Server(socket);
