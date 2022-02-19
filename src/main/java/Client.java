@@ -66,7 +66,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
         screen.getContentPane().setBackground(Color.WHITE);
         screen.setLayout(null);
-        screen.setSize(450, 800);
+        screen.setSize(460, 740);
         screen.setLocation(300, 50);
 //        setUndecorated(true);
         screen.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
