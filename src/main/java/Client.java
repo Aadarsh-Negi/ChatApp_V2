@@ -4,6 +4,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 
+import static javax.swing.BorderFactory.createEmptyBorder;
+
 public class Client implements ActionListener, Runnable, KeyListener{
     JPanel top_area;
     JTextField temp_msg;
@@ -46,16 +48,24 @@ public class Client implements ActionListener, Runnable, KeyListener{
         active_count = new JLabel("Active User : 0");
         active_count.setFont(new Font("SAN_SERIF",Font.BOLD,12));
         active_count.setForeground(Color.WHITE);
-        active_count.setBounds(170, 35, 100, 18);
+        active_count.setBounds(180, 40, 100, 18);
         top_area.add(active_count);
 
         all_msg = new JTextArea();
-        all_msg.setBounds(5, 75, 440, 570);
         all_msg.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
         all_msg.setEditable(false);
         all_msg.setLineWrap(true);
         all_msg.setWrapStyleWord(true);
-        screen.add(all_msg);
+        JScrollPane sp = new JScrollPane(all_msg,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sp.setBounds(5, 75, 440, 570);
+        sp.setBorder(createEmptyBorder());
+        sp.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+            }
+        });
+        screen.add(sp);
+
 
 
         temp_msg = new JTextField();
@@ -89,7 +99,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.add(temp_msg);
 
         sendFile = new JButton("Send File");
-        sendFile.setBounds(320, 700, 123, 40);
+        sendFile.setBounds(320, 675, 123, 30);
         sendFile.setBackground(new Color(7, 94, 84));
         sendFile.setForeground(Color.WHITE);
         sendFile.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
@@ -123,7 +133,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.add(sendFile);
 
         send = new JButton("Send");
-        send.setBounds(320, 655, 123, 40);
+        send.setBounds(320, 650, 123, 30);
         send.setBackground(new Color(7, 94, 84));
         send.setForeground(Color.WHITE);
         send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
@@ -144,9 +154,10 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
         screen.getContentPane().setBackground(Color.WHITE);
         screen.setLayout(null);
-        screen.setSize(460, 800);
+        screen.setSize(460, 750);
         screen.setLocation(300, 50);
         screen.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        screen.setResizable(false);
         screen.setVisible(true);
 
     }
@@ -197,8 +208,5 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
     @Override
     public void keyReleased(KeyEvent e) {}
-//    public static void main(String []args){
-//        new Client("ad","localhost",4444);
-//    }
 
 }

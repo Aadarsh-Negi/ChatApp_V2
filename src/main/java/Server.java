@@ -57,7 +57,6 @@ public class Server implements Runnable{
                 }
 
                 for(int i:to_remove) client_dout.remove(i);
-                System.out.println("Active User : " + client_dout.size());
                 for(DataOutputStream dt : client_dout){
                         dt.writeInt(client_dout.size());
                 }
