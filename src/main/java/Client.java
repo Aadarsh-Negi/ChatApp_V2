@@ -16,6 +16,8 @@ public class Client implements ActionListener, Runnable, KeyListener{
     DataOutputStream writer;
     DataInputStream reader;
     Socket socketClient;
+    JLabel l3;
+    JLabel active_count;
     Client(String s,String ip,int port){
         try{
             socketClient = new Socket(ip, port);
@@ -35,16 +37,17 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.add(top_area);
 
 
+        l3 = new JLabel("Chat Room");
+        l3.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
+        l3.setForeground(Color.WHITE);
+        l3.setBounds(170, 15, 100, 18);
+        top_area.add(l3);
 
-//
-//        JLabel l3 = new JLabel("Mirzapur");
-//        l3.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
-//        l3.setForeground(Color.WHITE);
-//        l3.setBounds(110, 15, 100, 18);
-//        top_area.add(l3);
-//
-//
-
+        active_count = new JLabel("Active User : 0");
+        active_count.setFont(new Font("SAN_SERIF",Font.BOLD,12));
+        active_count.setForeground(Color.WHITE);
+        active_count.setBounds(165, 35, 100, 18);
+        top_area.add(active_count);
 
         all_msg = new JTextArea();
         all_msg.setBounds(5, 75, 440, 570);
@@ -104,18 +107,16 @@ public class Client implements ActionListener, Runnable, KeyListener{
                         fileInputStream.read(fileContentbytes);
                         writer.writeInt(2);
 
-//                        System.out.println("ck1");
                          writer.writeInt(fileContentbytes.length);
-//                        System.out.println("ck2");
+
                          writer.write(fileContentbytes);
-//                        System.out.println("ck3");
+
                         writer.flush();
                     } catch (FileNotFoundException ex) {
                         ex.printStackTrace();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-
                 }
             }
         });
@@ -145,7 +146,6 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.setLayout(null);
         screen.setSize(460, 800);
         screen.setLocation(300, 50);
-//        setUndecorated(true);
         screen.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         screen.setVisible(true);
 
@@ -155,47 +155,31 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
     public void run() {
         while (true) {
-        int flag = 0;
-        try {
-            flag = reader.readInt();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+            int flag = 0;
+            try {
+                flag = reader.readInt();
+                if (flag == 2) {
 
-        if (flag == 2) {
+                    int fileContentlen = 0;
+                        fileContentlen = reader.readInt();
 
-            int fileContentlen = 0;
-//            try {
-                fileContentlen = reader.readInt();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-            System.out.println("len :" + fileContentlen);
-            byte[] fb = new byte[fileContentlen];
-            System.out.println("done 1");
-//            try {
-                reader.readFully(fb, 0, fileContentlen);
-                File downlaod = new File("new");
-                FileOutputStream fout = new FileOutputStream(downlaod);
-                fout.write(fb);
-                fout.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-            System.out.println("done 2");
-//            return;
-        }else{
-//            try {
-                String msg = "";
-                System.out.println("here");
+                    byte[] fb = new byte[fileContentlen];
 
-                msg = reader.readUTF();
-                System.out.println("rec: " + msg);
-                all_msg.append(msg + "\n");
+                        reader.readFully(fb, 0, fileContentlen);
+                        File downlaod = new File("new");
+                        FileOutputStream fout = new FileOutputStream(downlaod);
+                        fout.write(fb);
+                        fout.close();
 
-            }
-//        catch(Exception e){}
-        }catch (Exception ee){}
+                }else{
+                        String msg = "";
+                        msg = reader.readUTF();
+                        all_msg.append(msg + "\n");
+
+                    }
+
+                active_count.setText("Active User : " + reader.readInt());
+            }catch (Exception ee){}
         }
 
     }
@@ -212,8 +196,8 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
     @Override
     public void keyReleased(KeyEvent e) {}
-
-//    public static void main(String []arg){
+//    public static void main(String []args){
 //        new Client("ad","localhost",4444);
 //    }
+
 }

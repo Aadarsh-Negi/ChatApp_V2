@@ -1,73 +1,67 @@
 import java.net.*;
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Server implements Runnable{
 
     Socket socket;
-
-//    static Vector<BufferedWriter> client_writer = new Vector<>();
     static Vector<DataOutputStream> client_dout = new Vector<>();
 
     public Server(Socket socket){
-//        try{
             this.socket = socket;
-//        }catch(Exception e){}
     }
 
 
     public void run(){
         try{
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             DataInputStream din = new DataInputStream(socket.getInputStream());
             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
 
-//            client_writer.add(writer);
             client_dout.add(dout);
 
             while(true){
                 int msg = din.readInt();
+                Vector<Integer> to_remove = new Vector<>();
+                int index_to_remove=0;
                 if(msg==1){
-                    System.out.println("msg ok");
                     String data = din.readUTF();
-                    System.out.println("msg : - " +data);
                     for (DataOutputStream BW : client_dout) {
-//                        try {
-                        System.out.println("sending . . . " );
+                        try{
                             BW.writeInt(1);
                             BW.writeUTF(data);
                             BW.flush();
-//                        } catch (Exception e) {}
+                        }catch (IOException ee){
+                            to_remove.add(index_to_remove);
+                        }
+                        index_to_remove++;
                     }
                 }else {
-                    System.out.println("file recieved");
-                    int fileContentlen = din.readInt();
-                    System.out.println("len :"+ fileContentlen);
-                    byte[] fb = new byte[fileContentlen];
-                    System.out.println("done 1");
-                    din.readFully(fb,0,fileContentlen);
-                    System.out.println("done 2");
-//                    File downlaod = new File("new");
-//                    try {
-                        for (DataOutputStream dt : client_dout) {
-                                dt.writeInt(2);
-                                dt.writeInt(fileContentlen);
-                                dt.write(fb);
-                        }
-//                        FileOutputStream fout  = new FileOutputStream(downlaod);
-//                        fout.write(fb);
-//                        fout.close();
 
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-                    System.out.println("looks good");
+
+
+                    int fileContentlen = din.readInt();
+                    byte[] fb = new byte[fileContentlen];
+                    din.readFully(fb,0,fileContentlen);
+
+                        for (DataOutputStream dt : client_dout) {
+                            try{
+                                   dt.writeInt(2);
+                                   dt.writeInt(fileContentlen);
+                                   dt.write(fb);
+                            }catch (IOException ee){
+                                     to_remove.add(index_to_remove);
+                              }
+                              index_to_remove++;
+                        }
                 }
-//                    reader.readLine()
-                System.out.println("outt");
+                System.out.println(to_remove.size() + " users left");
+                for(int i:to_remove) client_dout.remove(i);
+                for(DataOutputStream dt : client_dout){
+                        dt.writeInt(client_dout.size());
+                }
             }
-        }catch(Exception e){}
+        }catch (IOException e){}
 
     }
 

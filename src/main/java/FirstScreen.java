@@ -43,11 +43,8 @@ public class FirstScreen implements ActionListener {
 
         connect = new JButton("Connect to chat Room");
         connect.setBounds(40,220,170,50);
-//        send.setBackground(new Color(7,71,7));
         connect.addActionListener(this);
         screen.add(connect);
-
-
 
         screen.setLayout(null);
         screen.setSize(260,350);
