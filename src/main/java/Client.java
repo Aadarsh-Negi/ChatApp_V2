@@ -9,15 +9,26 @@ public class Client implements ActionListener, Runnable, KeyListener{
     JPanel top_area;
     JTextField temp_msg;
     JButton send;
+    JButton sendFile;
+    File file;
     static  JFrame screen;
     static JTextArea all_msg;
     String UserName;
     BufferedWriter writer;
     BufferedReader reader;
-
+    Socket socketClient;
     Client(String s,String ip,int port){
+        try{
+            socketClient = new Socket(ip, port);
+            writer = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Unable to connect to Server. Try again.");
+//            System.exit(0) ;
+        }
+
         UserName = "[" + s + "] : ";
-        screen = new JFrame();
+        screen = new JFrame("ChatApp");
         top_area = new JPanel();
         top_area.setLayout(null);
         top_area.setBackground(new Color(7, 94, 84));
@@ -47,71 +58,109 @@ public class Client implements ActionListener, Runnable, KeyListener{
         all_msg.setEditable(false);
         all_msg.setLineWrap(true);
         all_msg.setWrapStyleWord(true);
-        screen.add(all_msg);
+//        screen.add(all_msg);
 
 
         temp_msg = new JTextField();
         temp_msg.setBounds(5, 655, 310, 40);
-        temp_msg.addActionListener(this);
+        temp_msg.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    String str = UserName + temp_msg.getText();
+                    if (str.length() == UserName.length()) return;
+                    try {
+                        writer.write(1);
+                        writer.write(str + "\r\n");
+                        writer.flush();
+                    } catch (Exception e2) {}
+                    temp_msg.setText("");
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
         temp_msg.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
         screen.add(temp_msg);
+
+        sendFile = new JButton("Send File");
+        sendFile.setBounds(320, 700, 123, 40);
+        sendFile.setBackground(new Color(7, 94, 84));
+        sendFile.setForeground(Color.WHITE);
+        sendFile.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
+        sendFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                JFileChooser send_file = new JFileChooser();
+                send_file.setDialogTitle("Choose a file to send");
+                if(send_file.showOpenDialog(null)==send_file.APPROVE_OPTION){
+                    file = send_file.getSelectedFile();
+                    try {
+                        FileInputStream fileInputStream  = new FileInputStream(file.getAbsolutePath());
+                         DataOutputStream dout = new DataOutputStream(socketClient.getOutputStream());
+                        byte[] fileContentbytes = new byte[(int) file.length()];
+                        fileInputStream.read(fileContentbytes);
+                        writer.write(2);
+                        writer.flush();
+                        System.out.println("ck1");
+                         dout.writeInt(fileContentbytes.length);
+                        System.out.println("ck2");
+                         dout.write(fileContentbytes);
+                        System.out.println("ck3");
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+        screen.add(sendFile);
 
         send = new JButton("Send");
         send.setBounds(320, 655, 123, 40);
         send.setBackground(new Color(7, 94, 84));
         send.setForeground(Color.WHITE);
         send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
-        send.addActionListener(this);
+        send.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String str = UserName+ temp_msg.getText();
+                if(str.length() == UserName.length()) return;
+                try{
+                    writer.write(1);
+                    writer.write(str + "\r\n");
+                    writer.flush();
+                }catch(Exception e2){}
+                temp_msg.setText("");
+            }
+        });
         screen.add(send);
 
         screen.getContentPane().setBackground(Color.WHITE);
         screen.setLayout(null);
-        screen.setSize(460, 740);
+        screen.setSize(460, 800);
         screen.setLocation(300, 50);
 //        setUndecorated(true);
         screen.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         screen.setVisible(true);
 
-        try{
-
-            Socket socketClient = new Socket(ip, port);
-            writer = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-        }catch(Exception e){}
 
 
     }
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode()==KeyEvent.VK_ENTER){
-            String str = UserName+ temp_msg.getText();
-            if(str.length() == UserName.length()) return;
-            try{
-                writer.write(str);
-                writer.write("\r\n");
-                writer.flush();
-            }catch(Exception e2){}
-            temp_msg.setText("");
 
-        }
-    }
 
-    @Override
-    public void keyReleased(KeyEvent arg) {}
-
-    @Override
-    public void keyTyped(KeyEvent arg) {}
-
-    public void actionPerformed(ActionEvent ae){
-        String str = UserName+ temp_msg.getText();
-        if(str.length() == UserName.length()) return;
-        try{
-            writer.write(str);
-            writer.write("\r\n");
-            writer.flush();
-        }catch(Exception e){}
-        temp_msg.setText("");
-    }
 
     public void run(){
         try{
@@ -120,5 +169,21 @@ public class Client implements ActionListener, Runnable, KeyListener{
                 all_msg.append(msg + "\n");
             }
         }catch(Exception e){}
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {}
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {}
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    public static void main(String []arg){
+        new Client("ad","localhost",4444);
     }
 }

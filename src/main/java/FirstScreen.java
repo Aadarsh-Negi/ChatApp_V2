@@ -13,7 +13,7 @@ public class FirstScreen implements ActionListener {
     JLabel txt3;
     JButton connect;
     FirstScreen(){
-        screen = new JFrame();
+        screen = new JFrame("ChatApp");
 
         txt = new JLabel("Enter your name");
         txt.setBounds(20,20,100,20);
@@ -58,8 +58,6 @@ public class FirstScreen implements ActionListener {
 
     public static void main(String[] arg){
         new FirstScreen();
-
-
     }
 
 
