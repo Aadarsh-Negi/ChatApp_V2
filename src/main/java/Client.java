@@ -38,15 +38,15 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
 
         l3 = new JLabel("Chat Room");
-        l3.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
+        l3.setFont(new Font("SAN_SERIF", Font.BOLD, 22));
         l3.setForeground(Color.WHITE);
-        l3.setBounds(170, 15, 100, 18);
+        l3.setBounds(165, 15, 120, 18);
         top_area.add(l3);
 
         active_count = new JLabel("Active User : 0");
         active_count.setFont(new Font("SAN_SERIF",Font.BOLD,12));
         active_count.setForeground(Color.WHITE);
-        active_count.setBounds(165, 35, 100, 18);
+        active_count.setBounds(170, 35, 100, 18);
         top_area.add(active_count);
 
         all_msg = new JTextArea();
@@ -106,7 +106,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
                         byte[] fileContentbytes = new byte[(int) file.length()];
                         fileInputStream.read(fileContentbytes);
                         writer.writeInt(2);
-
+                        writer.writeUTF(file.getName());
                          writer.writeInt(fileContentbytes.length);
 
                          writer.write(fileContentbytes);
@@ -160,24 +160,25 @@ public class Client implements ActionListener, Runnable, KeyListener{
                 flag = reader.readInt();
                 if (flag == 2) {
 
+                    String file_name = reader.readUTF();
+
                     int fileContentlen = 0;
-                        fileContentlen = reader.readInt();
+                    fileContentlen = reader.readInt();
 
                     byte[] fb = new byte[fileContentlen];
 
                         reader.readFully(fb, 0, fileContentlen);
-                        File downlaod = new File("new");
+                        File downlaod = new File(file_name);
                         FileOutputStream fout = new FileOutputStream(downlaod);
                         fout.write(fb);
+                        JOptionPane.showMessageDialog(screen, "New file recieved");
                         fout.close();
-
                 }else{
                         String msg = "";
                         msg = reader.readUTF();
                         all_msg.append(msg + "\n");
 
                     }
-
                 active_count.setText("Active User : " + reader.readInt());
             }catch (Exception ee){}
         }

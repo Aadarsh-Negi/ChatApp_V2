@@ -1,6 +1,5 @@
 import java.net.*;
 import java.io.*;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Server implements Runnable{
@@ -39,7 +38,7 @@ public class Server implements Runnable{
                 }else {
 
 
-
+                    String file_name = din.readUTF();
                     int fileContentlen = din.readInt();
                     byte[] fb = new byte[fileContentlen];
                     din.readFully(fb,0,fileContentlen);
@@ -47,6 +46,7 @@ public class Server implements Runnable{
                         for (DataOutputStream dt : client_dout) {
                             try{
                                    dt.writeInt(2);
+                                   dt.writeUTF(file_name);
                                    dt.writeInt(fileContentlen);
                                    dt.write(fb);
                             }catch (IOException ee){
@@ -55,8 +55,9 @@ public class Server implements Runnable{
                               index_to_remove++;
                         }
                 }
-                System.out.println(to_remove.size() + " users left");
+
                 for(int i:to_remove) client_dout.remove(i);
+                System.out.println("Active User : " + client_dout.size());
                 for(DataOutputStream dt : client_dout){
                         dt.writeInt(client_dout.size());
                 }
