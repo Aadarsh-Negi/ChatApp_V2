@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
 import java.net.*;
 
@@ -24,7 +23,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
             reader = new DataInputStream(new DataInputStream(socketClient.getInputStream()));
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "Unable to connect to Server. Try again.");
-//            System.exit(0) ;
+            System.exit(0) ;
         }
 
         UserName = "[" + s + "] : ";
@@ -45,11 +44,6 @@ public class Client implements ActionListener, Runnable, KeyListener{
 //        top_area.add(l3);
 //
 //
-//        JLabel l4 = new JLabel("Kaaleen, Guddu, Bablu, Sweety, IG Dubey, Shukla");
-//        l4.setFont(new Font("SAN_SERIF", Font.PLAIN, 14));
-//        l4.setForeground(Color.WHITE);
-//        l4.setBounds(110, 35, 160, 20);
-//        top_area.add(l4);
 
 
         all_msg = new JTextArea();
@@ -106,16 +100,15 @@ public class Client implements ActionListener, Runnable, KeyListener{
                     file = send_file.getSelectedFile();
                     try {
                         FileInputStream fileInputStream  = new FileInputStream(file.getAbsolutePath());
-//                         DataOutputStream dout = new DataOutputStream(socketClient.getOutputStream());
                         byte[] fileContentbytes = new byte[(int) file.length()];
                         fileInputStream.read(fileContentbytes);
                         writer.writeInt(2);
-//                        writer.flush();
-                        System.out.println("ck1");
+
+//                        System.out.println("ck1");
                          writer.writeInt(fileContentbytes.length);
-                        System.out.println("ck2");
+//                        System.out.println("ck2");
                          writer.write(fileContentbytes);
-                        System.out.println("ck3");
+//                        System.out.println("ck3");
                         writer.flush();
                     } catch (FileNotFoundException ex) {
                         ex.printStackTrace();
@@ -126,7 +119,6 @@ public class Client implements ActionListener, Runnable, KeyListener{
                 }
             }
         });
-
         screen.add(sendFile);
 
         send = new JButton("Send");
@@ -157,8 +149,6 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         screen.setVisible(true);
 
-
-
     }
 
 
@@ -168,34 +158,34 @@ public class Client implements ActionListener, Runnable, KeyListener{
         int flag = 0;
         try {
             flag = reader.readInt();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         if (flag == 2) {
 
             int fileContentlen = 0;
-            try {
+//            try {
                 fileContentlen = reader.readInt();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             System.out.println("len :" + fileContentlen);
             byte[] fb = new byte[fileContentlen];
             System.out.println("done 1");
-            try {
+//            try {
                 reader.readFully(fb, 0, fileContentlen);
                 File downlaod = new File("new");
                 FileOutputStream fout = new FileOutputStream(downlaod);
                 fout.write(fb);
                 fout.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             System.out.println("done 2");
 //            return;
         }else{
-            try {
+//            try {
                 String msg = "";
                 System.out.println("here");
 
@@ -203,8 +193,9 @@ public class Client implements ActionListener, Runnable, KeyListener{
                 System.out.println("rec: " + msg);
                 all_msg.append(msg + "\n");
 
-            }catch(Exception e){}
-        }
+            }
+//        catch(Exception e){}
+        }catch (Exception ee){}
         }
 
     }

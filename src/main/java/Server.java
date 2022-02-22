@@ -1,4 +1,3 @@
-
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -7,24 +6,24 @@ public class Server implements Runnable{
 
     Socket socket;
 
-    static Vector<BufferedWriter> client_writer = new Vector<>();
+//    static Vector<BufferedWriter> client_writer = new Vector<>();
     static Vector<DataOutputStream> client_dout = new Vector<>();
 
     public Server(Socket socket){
-        try{
+//        try{
             this.socket = socket;
-        }catch(Exception e){}
+//        }catch(Exception e){}
     }
 
 
     public void run(){
         try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             DataInputStream din = new DataInputStream(socket.getInputStream());
             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
 
-            client_writer.add(writer);
+//            client_writer.add(writer);
             client_dout.add(dout);
 
             while(true){
@@ -50,7 +49,7 @@ public class Server implements Runnable{
                     din.readFully(fb,0,fileContentlen);
                     System.out.println("done 2");
 //                    File downlaod = new File("new");
-                    try {
+//                    try {
                         for (DataOutputStream dt : client_dout) {
                                 dt.writeInt(2);
                                 dt.writeInt(fileContentlen);
@@ -60,9 +59,9 @@ public class Server implements Runnable{
 //                        fout.write(fb);
 //                        fout.close();
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                     System.out.println("looks good");
                 }
 //                    reader.readLine()
