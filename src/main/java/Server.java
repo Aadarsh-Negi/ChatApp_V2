@@ -1,7 +1,6 @@
 
 import java.net.*;
 import java.io.*;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Server implements Runnable{
@@ -48,11 +47,15 @@ public class Server implements Runnable{
                     System.out.println("done 1");
                     din.readFully(fb,0,fileContentlen);
                     System.out.println("done 2");
-                    File downlaod = new File("new");
+//                    File downlaod = new File("new");
                     try {
-                        FileOutputStream fout  = new FileOutputStream(downlaod);
-                        fout.write(fb);
-                        fout.close();
+                        for (DataOutputStream dt : client_dout) {
+                                dt.writeInt(fileContentlen);
+                                dt.write(fb);
+                        }
+//                        FileOutputStream fout  = new FileOutputStream(downlaod);
+//                        fout.write(fb);
+//                        fout.close();
 
                     } catch (IOException e) {
                         e.printStackTrace();

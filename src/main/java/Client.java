@@ -163,6 +163,39 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
 
     public void run(){
+        int flag = 0;
+        try {
+            flag = Integer.parseInt(String.valueOf(reader.read()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(flag == 1){
+            DataInputStream din = null;
+            try {
+                din = new DataInputStream(socketClient.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            int fileContentlen = 0;
+            try {
+                fileContentlen = din.readInt();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("len :"+ fileContentlen);
+            byte[] fb = new byte[fileContentlen];
+            System.out.println("done 1");
+            try {
+                din.readFully(fb,0,fileContentlen);
+                File downlaod = new File("new");
+                FileOutputStream fout  = new FileOutputStream(downlaod);
+                        fout.write(fb);
+                        fout.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("done 2");
+        }
         try{
             String msg = "";
             while((msg = reader.readLine()) != null){
