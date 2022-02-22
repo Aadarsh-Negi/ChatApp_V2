@@ -13,7 +13,7 @@ public class FirstScreen implements ActionListener {
     JLabel txt3;
     JButton connect;
     FirstScreen(){
-        screen = new JFrame();
+        screen = new JFrame("ChatApp");
 
         txt = new JLabel("Enter your name");
         txt.setBounds(20,20,100,20);
@@ -43,11 +43,8 @@ public class FirstScreen implements ActionListener {
 
         connect = new JButton("Connect to chat Room");
         connect.setBounds(40,220,170,50);
-//        send.setBackground(new Color(7,71,7));
         connect.addActionListener(this);
         screen.add(connect);
-
-
 
         screen.setLayout(null);
         screen.setSize(260,350);
@@ -58,8 +55,6 @@ public class FirstScreen implements ActionListener {
 
     public static void main(String[] arg){
         new FirstScreen();
-
-
     }
 
 

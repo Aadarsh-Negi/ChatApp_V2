@@ -1,4 +1,3 @@
-
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -6,38 +5,64 @@ import java.util.*;
 public class Server implements Runnable{
 
     Socket socket;
-
-    public static Vector client = new Vector();
+    static Vector<DataOutputStream> client_dout = new Vector<>();
 
     public Server(Socket socket){
-        try{
             this.socket = socket;
-        }catch(Exception e){}
     }
 
 
     public void run(){
         try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            DataInputStream din = new DataInputStream(socket.getInputStream());
+            DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
 
-            client.add(writer);
+            client_dout.add(dout);
 
             while(true){
-                String data = reader.readLine().trim();
+                int msg = din.readInt();
+                Vector<Integer> to_remove = new Vector<>();
+                int index_to_remove=0;
+                if(msg==1){
+                    String data = din.readUTF();
+                    for (DataOutputStream BW : client_dout) {
+                        try{
+                            BW.writeInt(1);
+                            BW.writeUTF(data);
+                            BW.flush();
+                        }catch (IOException ee){
+                            to_remove.add(index_to_remove);
+                        }
+                        index_to_remove++;
+                    }
+                }else {
 
 
-                for(int i = 0; i < client.size(); i++){
-                    try{
-                        BufferedWriter bw = (BufferedWriter)client.get(i);
-                        bw.write(data);
-                        bw.write("\r\n");
-                        bw.flush();
-                    }catch(Exception e){}
+                    String file_name = din.readUTF();
+                    int fileContentlen = din.readInt();
+                    byte[] fb = new byte[fileContentlen];
+                    din.readFully(fb,0,fileContentlen);
+
+                        for (DataOutputStream dt : client_dout) {
+                            try{
+                                   dt.writeInt(2);
+                                   dt.writeUTF(file_name);
+                                   dt.writeInt(fileContentlen);
+                                   dt.write(fb);
+                            }catch (IOException ee){
+                                     to_remove.add(index_to_remove);
+                              }
+                              index_to_remove++;
+                        }
                 }
 
+                for(int i:to_remove) client_dout.remove(i);
+                System.out.println("Active User : " + client_dout.size());
+                for(DataOutputStream dt : client_dout){
+                        dt.writeInt(client_dout.size());
+                }
             }
-        }catch(Exception e){}
+        }catch (IOException e){}
 
     }
 
@@ -47,7 +72,7 @@ public class Server implements Runnable{
         System.out.println("Server is UP on port 4444");
         while(true){
             Socket socket = s.accept();
-            System.out.println("We have new User");
+            System.out.println("We have a new User");
             Server server = new Server(socket);
             Thread thread = new Thread(server);
             thread.start();
