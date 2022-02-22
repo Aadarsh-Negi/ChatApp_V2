@@ -14,14 +14,14 @@ public class Client implements ActionListener, Runnable, KeyListener{
     static  JFrame screen;
     static JTextArea all_msg;
     String UserName;
-    BufferedWriter writer;
-    BufferedReader reader;
+    DataOutputStream writer;
+    DataInputStream reader;
     Socket socketClient;
     Client(String s,String ip,int port){
         try{
             socketClient = new Socket(ip, port);
-            writer = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+            writer = new DataOutputStream(new DataOutputStream(socketClient.getOutputStream()));
+            reader = new DataInputStream(new DataInputStream(socketClient.getInputStream()));
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "Unable to connect to Server. Try again.");
 //            System.exit(0) ;
@@ -58,7 +58,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
         all_msg.setEditable(false);
         all_msg.setLineWrap(true);
         all_msg.setWrapStyleWord(true);
-//        screen.add(all_msg);
+        screen.add(all_msg);
 
 
         temp_msg = new JTextField();
@@ -75,8 +75,8 @@ public class Client implements ActionListener, Runnable, KeyListener{
                     String str = UserName + temp_msg.getText();
                     if (str.length() == UserName.length()) return;
                     try {
-                        writer.write(1);
-                        writer.write(str + "\r\n");
+                        writer.writeInt(1);
+                        writer.writeUTF(str);
                         writer.flush();
                     } catch (Exception e2) {}
                     temp_msg.setText("");
@@ -106,16 +106,17 @@ public class Client implements ActionListener, Runnable, KeyListener{
                     file = send_file.getSelectedFile();
                     try {
                         FileInputStream fileInputStream  = new FileInputStream(file.getAbsolutePath());
-                         DataOutputStream dout = new DataOutputStream(socketClient.getOutputStream());
+//                         DataOutputStream dout = new DataOutputStream(socketClient.getOutputStream());
                         byte[] fileContentbytes = new byte[(int) file.length()];
                         fileInputStream.read(fileContentbytes);
-                        writer.write(2);
-                        writer.flush();
+                        writer.writeInt(2);
+//                        writer.flush();
                         System.out.println("ck1");
-                         dout.writeInt(fileContentbytes.length);
+                         writer.writeInt(fileContentbytes.length);
                         System.out.println("ck2");
-                         dout.write(fileContentbytes);
+                         writer.write(fileContentbytes);
                         System.out.println("ck3");
+                        writer.flush();
                     } catch (FileNotFoundException ex) {
                         ex.printStackTrace();
                     } catch (IOException ex) {
@@ -139,8 +140,8 @@ public class Client implements ActionListener, Runnable, KeyListener{
                 String str = UserName+ temp_msg.getText();
                 if(str.length() == UserName.length()) return;
                 try{
-                    writer.write(1);
-                    writer.write(str + "\r\n");
+                    writer.writeInt(1);
+                    writer.writeUTF(str);
                     writer.flush();
                 }catch(Exception e2){}
                 temp_msg.setText("");
@@ -162,47 +163,52 @@ public class Client implements ActionListener, Runnable, KeyListener{
 
 
 
-    public void run(){
+    public void run() {
+        while (true) {
         int flag = 0;
         try {
-            flag = Integer.parseInt(String.valueOf(reader.read()));
+            flag = reader.readInt();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(flag == 1){
-            DataInputStream din = null;
-            try {
-                din = new DataInputStream(socketClient.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+        if (flag == 2) {
+
             int fileContentlen = 0;
             try {
-                fileContentlen = din.readInt();
+                fileContentlen = reader.readInt();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("len :"+ fileContentlen);
+            System.out.println("len :" + fileContentlen);
             byte[] fb = new byte[fileContentlen];
             System.out.println("done 1");
             try {
-                din.readFully(fb,0,fileContentlen);
+                reader.readFully(fb, 0, fileContentlen);
                 File downlaod = new File("new");
-                FileOutputStream fout  = new FileOutputStream(downlaod);
-                        fout.write(fb);
-                        fout.close();
+                FileOutputStream fout = new FileOutputStream(downlaod);
+                fout.write(fb);
+                fout.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             System.out.println("done 2");
-        }
-        try{
-            String msg = "";
-            while((msg = reader.readLine()) != null){
+//            return;
+        }else{
+            try {
+                String msg = "";
+                System.out.println("here");
+
+                msg = reader.readUTF();
+                System.out.println("rec: " + msg);
                 all_msg.append(msg + "\n");
-            }
-        }catch(Exception e){}
+
+            }catch(Exception e){}
+        }
+        }
+
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {}
@@ -216,7 +222,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
     @Override
     public void keyReleased(KeyEvent e) {}
 
-    public static void main(String []arg){
-        new Client("ad","localhost",4444);
-    }
+//    public static void main(String []arg){
+//        new Client("ad","localhost",4444);
+//    }
 }

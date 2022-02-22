@@ -28,16 +28,18 @@ public class Server implements Runnable{
             client_dout.add(dout);
 
             while(true){
-                int msg = Integer.parseInt(String.valueOf(reader.read()));
+                int msg = din.readInt();
                 if(msg==1){
                     System.out.println("msg ok");
-                    String data = reader.readLine().trim();
+                    String data = din.readUTF();
                     System.out.println("msg : - " +data);
-                    for (BufferedWriter BW : client_writer) {
-                        try {
-                            BW.write(data + "\r\n");
+                    for (DataOutputStream BW : client_dout) {
+//                        try {
+                        System.out.println("sending . . . " );
+                            BW.writeInt(1);
+                            BW.writeUTF(data);
                             BW.flush();
-                        } catch (Exception e) {}
+//                        } catch (Exception e) {}
                     }
                 }else {
                     System.out.println("file recieved");
@@ -50,6 +52,7 @@ public class Server implements Runnable{
 //                    File downlaod = new File("new");
                     try {
                         for (DataOutputStream dt : client_dout) {
+                                dt.writeInt(2);
                                 dt.writeInt(fileContentlen);
                                 dt.write(fb);
                         }
