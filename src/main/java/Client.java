@@ -39,7 +39,7 @@ public class Client implements ActionListener, Runnable, KeyListener{
         screen.add(top_area);
 
 
-        l3 = new JLabel("Chat Room");
+        l3 = new JLabel(s,SwingConstants.CENTER);
         l3.setFont(new Font("SAN_SERIF", Font.BOLD, 22));
         l3.setForeground(Color.WHITE);
         l3.setBounds(165, 15, 120, 18);
